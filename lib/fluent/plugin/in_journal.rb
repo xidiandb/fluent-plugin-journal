@@ -15,8 +15,8 @@ module Fluent
 
       DEFAULT_STORAGE_TYPE = 'local'
 
-      config_param :pattern, :regexp, default: /./
-      config_param :path, :string, default: '/var/log/journal/*/*'
+      # config_param :pattern, :regexp, default: /./
+      # config_param :path, :string, default: '/var/log/journal/*/*'
       config_param :filters, :array, default: [], deprecated: 'filters has been renamed as matches'
       config_param :matches, :array, default: nil
       config_param :read_from_head, :bool, default: false
@@ -52,13 +52,13 @@ module Fluent
 
       def init_journal
         # TODO: ruby 2.3
-        @journal_files = []
-        files = Dir.glob(@path)
-        files.each do |f|
-          @journal_files = @journal_files << f if f =~ @pattern
-        end
+        # @journal_files = []
+        # files = Dir.glob(@path)
+        # files.each do |f|
+        #   @journal_files = @journal_files << f if f =~ @pattern
+        # end
         @journal.close if @journal # rubocop:disable Style/SafeNavigation
-        @journal = Systemd::Journal.new(files: @journal_files)
+        @journal = Systemd::Journal.new(flags: Systemd::Journal::Flags::RUNTIME_ONLY)
         @journal.filter(*(@matches || @filters))
         seek
         true
